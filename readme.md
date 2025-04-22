@@ -17,7 +17,6 @@ This project uses **Docker** and **Google Cloud Build** to deploy a Node.js + Pu
 
 3. **Create a `cloudbuild.yaml`** file to define the build process:
 - Name your image and give it a tag 
-- mine is `image7` with tag `amd64` 
 - google cloud will autofill the projectID
 # cloudbuild.yaml
 ```yaml
@@ -26,9 +25,9 @@ steps:
     script: |
       docker build -t us-west2-docker.pkg.dev/$PROJECT_ID/repository/image:tag .
     automapSubstitutions: true
-```
 images:
   - 'us-west2-docker.pkg.dev/$PROJECT_ID/repository/image:tag'
+```
 
 4. **Run the build** with:
 
