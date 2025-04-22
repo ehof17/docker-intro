@@ -8,6 +8,8 @@ This project uses **Docker** and **Google Cloud Build** to deploy a Node.js + Pu
 - This scraper vists the site, and intentionally fails to return the full solution for the day.
 - I plan to use this as part of a future project that explores player relationships and basketball data.
 
+> view the endpoint (takes like 100 seconds) https://server-2-await-558689769388.us-central1.run.app/get-ConnectionLinks
+
 ### Quick Steps to Deploy
 
 1. **Create a Docker repository** in your Google Cloud project (e.g., `nba-scraper`)
