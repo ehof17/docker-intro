@@ -8,6 +8,7 @@ lookerRouter.get("/looker/:site", async (req, res) => {
   try {
     const sitename = req.params.site;
     const result = await grabbersService.getByName(sitename);
+    res.set('Cache-Control', 'public, max-age=300');
     if (!result) {
       res.status(404).json({ message: "Not found" });
       return;
