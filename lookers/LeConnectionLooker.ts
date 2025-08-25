@@ -11,11 +11,16 @@ export default class LeConnectionsLooker extends Looker {
   
 
     public async getSolution() {
-      const page = await this.open();
-      await this.loseGame(page);
-      const solution = await this.scrapeSolution(page);
-      await this.close();
-      return solution;
+      const { context, page } = await this.open();
+      try{
+        await this.loseGame(page);
+        const solution = await this.scrapeSolution(page);
+        await this.close();
+        return solution;
+      }
+      finally{
+        await this.closeContext(context);
+      }
     }
   
     async loseGame(page:Page){

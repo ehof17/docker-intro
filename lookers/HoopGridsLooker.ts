@@ -13,24 +13,29 @@ export default class HoopGridsLooker extends Looker {
         return "https://connections.hoopgrids.com/";
     }
     public async getSolution(): Promise<solutionResult[]> {
-        const page = await this.open();
-        await this.closeBeginningModal(page);
+        const { context, page } = await this.open();
+        try{
+            await this.closeBeginningModal(page);
 
-        // scrape page for player names
-        // solution only shows player img
-        await this.storeNames(page);
-    
-        await this.clickFourPlayers(page);
-    
-        await this.clickSubmit(page);
-    
-        await this.clickNewPlayers(page);
-    
-        await this.clickSubmit(page);
-    
-        await this.endGame(page);
-        await this.sleep(6000);
-        return await this.scrapePlayers(page);
+            // scrape page for player names
+            // solution only shows player img
+            await this.storeNames(page);
+        
+            await this.clickFourPlayers(page);
+        
+            await this.clickSubmit(page);
+        
+            await this.clickNewPlayers(page);
+        
+            await this.clickSubmit(page);
+        
+            await this.endGame(page);
+            await this.sleep(6000);
+            return await this.scrapePlayers(page);
+        }
+        finally{
+            await this.closeContext(context);
+        }
     }
     checkTextForButton = async (page:Page, text:string) => {
         // first, check if there is a button with said text

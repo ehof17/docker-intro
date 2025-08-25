@@ -1,10 +1,12 @@
 import LeConnectionsLooker from '../lookers/LeConnectionLooker'
 import HoopGridsLooker from '../lookers/HoopGridsLooker';
 import Looker from '../lookers/lookerBase';
+import LeConnectionsHOFLooker from '../lookers/LeConnectionsHOFLooker';
 class GrabberService {
   private lookers: { [key: string]: Looker } = {
     "leconnections": new LeConnectionsLooker(),
-    "hoopgrids": new HoopGridsLooker()
+    "hoopgrids": new HoopGridsLooker(),
+    "leconnectionshof": new LeConnectionsHOFLooker()
   };
   
   async getByName(name: string) {

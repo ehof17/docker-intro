@@ -25,7 +25,17 @@ export default abstract class Looker {
     this.page = await this.browser.newPage();
   }
 
-    async open(): Promise<Page> {
+  private async launchIfNeeded() {
+    if (this.browser && this.browser.isConnected()) return;
+    this.browser = await puppeteer.launch({
+      args: ["--no-sandbox", "--disable-dev-shm-usage"],
+      defaultViewport: { width: 1280, height: 800 },
+    });
+  }
+
+    async open(): Promise<{ context: puppeteer.BrowserContext; page: Page }> {
+      await this.launchIfNeeded();
+      const context = await this.browser!.createBrowserContext();
       await this.init();
       const page = this.getPage();
       await page.goto(this.getStartUrl(), { waitUntil: "networkidle2" });
@@ -34,14 +44,19 @@ export default abstract class Looker {
       );
       await page.setViewport({ width: 1280, height: 800 });
       await page.reload({ waitUntil: ["networkidle2"] });
-      return page;
+      return { context, page };
     }
+
   async close(): Promise<void> {
     if (this.browser) {
       await this.browser.close();
       this.browser = null;
       this.page = null;
     }
+  }
+
+  protected async closeContext(context: puppeteer.BrowserContext) {
+    try { await context.close(); } catch {}
   }
 
   async sleep(ms: number): Promise<void> {
