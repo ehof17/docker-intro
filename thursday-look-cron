@@ -1,0 +1,1 @@
+0 17 * * 4 wget -qO- http://api:8080/api/lookerjob/hof >> /var/log/cron.log 2>&1

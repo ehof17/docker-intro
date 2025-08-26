@@ -5,11 +5,23 @@ services:
     ports:
       - "8080:8080"
 
-  cron:
+  cron-daily-look:
     image: alpine:latest
-    container_name: nba-looker-cron
+    environment:
+      - TZ=America/Phoenix
+    container_name: nba-looker-daily-cron
     depends_on:
       - api
     volumes:
       - ./daily-look-cron:/etc/crontabs/root
+    command: crond -f -l 2
+  cron-thursday-look:
+    image: alpine:latest
+    environment:
+      - TZ=America/Phoenix
+    container_name: nba-looker-thursday-cron
+    depends_on:
+      - api
+    volumes:
+      - ./thursday-look-cron:/etc/crontabs/root
     command: crond -f -l 2
