@@ -35,6 +35,7 @@ export const players = pgTable("players", {
     position: varchar("position", { length: 50 }),
     isactive: boolean("isactive").default(true),
     birthdate: date("birthdate", { mode: "date" }).notNull(),
+    nbaid: integer("nbaid").unique(),
 },
 (t) => ({
   nameDobUq: uniqueIndex("players_first_last_birthdate_uq")
