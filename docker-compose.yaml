@@ -7,8 +7,6 @@ services:
 
   cron-daily-look:
     image: alpine:latest
-    environment:
-      - TZ=America/Phoenix
     container_name: nba-looker-daily-cron
     depends_on:
       - api
@@ -17,8 +15,6 @@ services:
     command: crond -f -l 2
   cron-thursday-look:
     image: alpine:latest
-    environment:
-      - TZ=America/Phoenix
     container_name: nba-looker-thursday-cron
     depends_on:
       - api

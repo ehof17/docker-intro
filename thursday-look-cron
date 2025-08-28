@@ -1,1 +1,1 @@
-0 18 * * 4 wget -qO- http://api:8080/api/lookerjob/weekly >> /var/log/cron.log 2>&1
+0 1 * * 5 wget -qO- http://api:8080/api/lookerjob/weekly >> /var/log/cron.log 2>&1
