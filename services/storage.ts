@@ -38,8 +38,19 @@ export default class StorageService{
         return inserted[0].id;
     }
     async ConnectConnections(playerids: number[], connectionId:number){
+        // need to check if connection already exists
+        const existingConnections = await db
+        .select()
+        .from(connectiontoplayer)
+        .where(and(
+            eq(connectiontoplayer.connectionid, connectionId),
+            inArray(connectiontoplayer.playerid, playerids)
+        ));
+        const existingPlayerIds = existingConnections.map(c => c.playerid);
+        const newPlayerIds = playerids.filter(id => !existingPlayerIds.includes(id));
+        
         await Promise.all(
-            playerids.map(id => this.insertConnectionToPlayer(id, connectionId))
+            newPlayerIds.map(id => this.insertConnectionToPlayer(id, connectionId))
         );
 
     }
