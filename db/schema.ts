@@ -1,6 +1,8 @@
+import { pgTableCreator } from "drizzle-orm/pg-core";
 import {  text, serial, pgTable, timestamp, primaryKey, 
           varchar, numeric, boolean, integer, unique, uniqueIndex, 
           date} from "drizzle-orm/pg-core";
+import { string } from "yargs";
 
 export const franchise = pgTable("franchise", {
     franchiseid: serial("franchiseid").primaryKey().notNull(),
@@ -72,3 +74,12 @@ export const connectiontoplayer = pgTable(
     })
   );
   
+
+  export const scraped = pgTable("scraped", {
+    siteName: text("site_name").notNull(),
+    player: text("player").notNull(),
+    connectionName: text("connection_name").notNull(),
+    siteGameId: text("site_game_id").notNull(),
+    insertDate: date("insert_date").defaultNow(),
+    gameDate: date("game_date").notNull(),
+  });

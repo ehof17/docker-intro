@@ -1,23 +1,13 @@
+version: "3.9"
 services:
-  api:
+  nba-looker:
     build: .
-    container_name: nba-looker-api
+    container_name: nba-looker
     ports:
       - "8080:8080"
-
-  cron-daily-look:
-    image: alpine:latest
-    container_name: nba-looker-daily-cron
-    depends_on:
-      - api
-    volumes:
-      - ./daily-look-cron:/etc/crontabs/root
-    command: crond -f -l 2
-  cron-thursday-look:
-    image: alpine:latest
-    container_name: nba-looker-thursday-cron
-    depends_on:
-      - api
-    volumes:
-      - ./thursday-look-cron:/etc/crontabs/root
-    command: crond -f -l 2
+    environment:
+      TZ: America/Phoenix
+      NODE_ENV: production
+    env_file:
+      - .env
+    command: ["cron", "-f"]

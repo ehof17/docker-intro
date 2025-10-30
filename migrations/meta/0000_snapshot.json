@@ -1,0 +1,341 @@
+{
+  "id": "c5e93433-1687-4bae-ae55-df33fff1374a",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.connections": {
+      "name": "connections",
+      "schema": "",
+      "columns": {
+        "connectionid": {
+          "name": "connectionid",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "connections_description_unique": {
+          "name": "connections_description_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "description"
+          ]
+        },
+        "unique_description": {
+          "name": "unique_description",
+          "nullsNotDistinct": false,
+          "columns": [
+            "description"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.connectiontoplayer": {
+      "name": "connectiontoplayer",
+      "schema": "",
+      "columns": {
+        "connectionid": {
+          "name": "connectionid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "playerid": {
+          "name": "playerid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "connectiontoplayer_connectionid_connections_connectionid_fk": {
+          "name": "connectiontoplayer_connectionid_connections_connectionid_fk",
+          "tableFrom": "connectiontoplayer",
+          "tableTo": "connections",
+          "columnsFrom": [
+            "connectionid"
+          ],
+          "columnsTo": [
+            "connectionid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "connectiontoplayer_playerid_players_playerid_fk": {
+          "name": "connectiontoplayer_playerid_players_playerid_fk",
+          "tableFrom": "connectiontoplayer",
+          "tableTo": "players",
+          "columnsFrom": [
+            "playerid"
+          ],
+          "columnsTo": [
+            "playerid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "connectiontoplayer_connectionid_playerid_pk": {
+          "name": "connectiontoplayer_connectionid_playerid_pk",
+          "columns": [
+            "connectionid",
+            "playerid"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.draftinfo": {
+      "name": "draftinfo",
+      "schema": "",
+      "columns": {
+        "playerid": {
+          "name": "playerid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "draftyear": {
+          "name": "draftyear",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "round": {
+          "name": "round",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pick": {
+          "name": "pick",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "draftedbyid": {
+          "name": "draftedbyid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "draftinfo_draftedbyid_franchise_franchiseid_fk": {
+          "name": "draftinfo_draftedbyid_franchise_franchiseid_fk",
+          "tableFrom": "draftinfo",
+          "tableTo": "franchise",
+          "columnsFrom": [
+            "draftedbyid"
+          ],
+          "columnsTo": [
+            "franchiseid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "draftinfo_pkey": {
+          "name": "draftinfo_pkey",
+          "columns": [
+            "playerid",
+            "draftyear"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.franchise": {
+      "name": "franchise",
+      "schema": "",
+      "columns": {
+        "franchiseid": {
+          "name": "franchiseid",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "city": {
+          "name": "city",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "abbreviation": {
+          "name": "abbreviation",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "franchise_name_city_uq": {
+          "name": "franchise_name_city_uq",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "city",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.players": {
+      "name": "players",
+      "schema": "",
+      "columns": {
+        "playerid": {
+          "name": "playerid",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "firstname": {
+          "name": "firstname",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lastname": {
+          "name": "lastname",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nationality": {
+          "name": "nationality",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "position": {
+          "name": "position",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "isactive": {
+          "name": "isactive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "birthdate": {
+          "name": "birthdate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nbaid": {
+          "name": "nbaid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "players_first_last_birthdate_uq": {
+          "name": "players_first_last_birthdate_uq",
+          "columns": [
+            {
+              "expression": "firstname",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "lastname",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "birthdate",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "players_nbaid_unique": {
+          "name": "players_nbaid_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "nbaid"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

@@ -13,7 +13,7 @@ class GrabberService {
   private cache = new TTLCache<string, solutionResult[]>(10 * 60 * 1000); // 10 min
   private inflight = new Map<string, Promise<solutionResult[]>>();
 
-  async getByName(name: string) {
+  async getByName(name: string, id?: string) {
     const key = name.toLowerCase();
     const cached = this.cache.get(key);
     if (cached) return cached;
@@ -24,12 +24,22 @@ class GrabberService {
     const looker = this.lookers[key];
     if (!looker) throw new Error(`No looker registered for "${name}"`);
 
-    const p = looker.getSolution()
+    if (!id){
+      const p = looker.getSolution()
       .then(res => { this.cache.set(key, res); this.inflight.delete(key); return res; })
       .catch(err => { this.inflight.delete(key); throw err; });
 
-    this.inflight.set(key, p);
-    return p;
+      this.inflight.set(key, p);
+      return p;
+    }
+    else{
+      const p = looker.getSolutionAtGameId(id)
+      .then(res => { this.cache.set(key, res); this.inflight.delete(key); return res; })
+      .catch(err => { this.inflight.delete(key); throw err; });
+
+      this.inflight.set(key, p);
+      return p;
+    }
   }
 }
   

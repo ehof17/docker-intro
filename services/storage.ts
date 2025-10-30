@@ -1,6 +1,6 @@
 // stores the json into the neon tables
 import { db } from "../db/drizzle";
-import { players, connections, connectiontoplayer } from "../db/schema"
+import { players, connections, connectiontoplayer, scraped } from "../db/schema"
 import { eq, inArray, sql, and,notInArray } from "drizzle-orm";
 
 import { dbConnection, solutionResult } from '../utils/types';
@@ -116,5 +116,39 @@ export default class StorageService{
 
 
     }
+    async getAllGameIdsBySite(siteName: string): Promise<string[]> {
+        const rows = await db
+          .selectDistinct({ gameId: scraped.siteGameId })
+          .from(scraped)
+          .where(eq(scraped.siteName, siteName));
+      
+        return rows.map(r => r.gameId);
+    }
+    toSqlDate = (d: Date) => d.toISOString().slice(0, 10);
 
-}
+    async saveLooked(
+        conn: solutionResult,
+        gameId: string,
+        siteName: string,
+        gameDate: Date
+      ): Promise<Array<{ id: string }>> {
+        const playersList = conn.players ?? [];
+        if (playersList.length === 0) return [];
+    
+        const rows = playersList.map((player) => ({
+          siteName,
+          siteGameId: String(gameId),
+          connectionName: conn.title,
+          player,
+          gameDate: this.toSqlDate(gameDate), 
+        }));
+    
+        const inserted = await db
+          .insert(scraped)
+          .values(rows)
+          .onConflictDoNothing({ where: sql`constraint scraped_unique_idx` })
+          .returning({ id: scraped.siteGameId});
+    
+        return inserted;
+      }
+    }

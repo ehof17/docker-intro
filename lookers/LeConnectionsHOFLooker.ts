@@ -5,26 +5,26 @@ export default class LeConnectionsHOFLooker extends Looker {
     constructor() {
       super();
     }
-    protected getStartUrl(): string {
-      return "https://www.leconnections.app/hof";
-    }
-  
+    protected siteName() { return "leconnectionshof"; }
+    protected startUrl() { return "https://www.leconnections.app/hof"; }
+    // HOF archive uses the same archive route as normal connections; IDs just start at 100001
+    protected archiveUrl(gameId: string) { return `https://www.leconnections.app/archive/${gameId}`; }
+    protected async validateLoaded(page: Page, args: { gameId?: string }) {
+      if (args.gameId) {
+        const gameIdInt = parseInt(args.gameId);
+        if (gameIdInt < 100000){
+          throw new Error(`Archive ${args.gameId} not compatible with hall of fame leConnections. Minumum game id is 100001`);
+        }
 
-    public async getSolution() {
-      const { context, page } = await this.open();
-      try{
-    // this sites ads way too big
-        await page.setViewport({ width: 2560, height: 1600 });
-        // try if browser saved solution
-        await this.loseGame(page);
-        const solution = await this.scrapeSolution(page);
-        await this.close();
-        return solution;
+        const stayedOnArchive = page.url().endsWith(`/archive/${args.gameId}`);
+        if (!stayedOnArchive) {
+          throw new Error(`Archive ${args.gameId} not released (navigated to ${page.url()})`);
+        }
+      } else {
+        // HOF page has bigger board so gotta extend
+        await page.setViewport({ width: 2560, height: 1600 }).catch(() => {});
+        await page.waitForSelector("app-game-board", { timeout: 15000 });
       }
-      finally{
-        await this.closeContext(context);
-      }
-     
     }
 
     async loseGame(page:Page) {

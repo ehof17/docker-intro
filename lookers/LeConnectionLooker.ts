@@ -5,21 +5,17 @@ export default class LeConnectionsLooker extends Looker {
     constructor() {
       super();
     }
-    protected getStartUrl(): string {
-      return "https://www.leconnections.app/";
-    }
-  
+    protected siteName() { return "leconnections"; }
+    protected startUrl() { return "https://www.leconnections.app/"; }
+    protected archiveUrl(gameId: string) { return `https://www.leconnections.app/archive/${gameId}`; }
 
-    public async getSolution() {
-      const { context, page } = await this.open();
-      try{
-        await this.loseGame(page);
-        const solution = await this.scrapeSolution(page);
-        await this.close();
-        return solution;
-      }
-      finally{
-        await this.closeContext(context);
+    protected async validateLoaded(page: Page, args: { gameId?: string }) {
+      if (args.gameId) {
+        // If SPA reroutes to home, this will not match:
+        const stayedOnArchive = page.url().endsWith(`/archive/${args.gameId}`);
+        if (!stayedOnArchive) throw new Error(`Archive ${args.gameId} not released (redirected to ${page.url()})`);
+      } else {
+        await page.waitForSelector("app-game-board", { timeout: 10000 });
       }
     }
   
@@ -70,14 +66,17 @@ export default class LeConnectionsLooker extends Looker {
               await this.clickSpecificPlayer(page, i+5); // select a new player
               await this.clickSubmit(page);
           }
-         
-        
   }}
   
     async scrapeSolution(page:Page) {
 
+      // might need to change this
+      const isArchive = page.url().toLowerCase().includes("archive");
+  
+      const losinggrid = isArchive
+        ? "::-p-xpath(/html/body/app-root/div/div[3]/div[2]/app-archive/div/div/app-game-board/div/div/div[1])"
+        : "::-p-xpath(/html/body/app-root/div/div[3]/div[2]/app-game/div/div/app-game-board/div/div/div[1])";
 
-      const losinggrid = "::-p-xpath(/html/body/app-root/div/div[3]/div[2]/app-game/div/div/app-game-board/div/div/div[1])"
       await page.waitForSelector(losinggrid);
         const losingGrid = await page.$(losinggrid);
         if (!losingGrid) {
@@ -113,7 +112,12 @@ export default class LeConnectionsLooker extends Looker {
       return result;
     }
     async clickSpecificPlayer(page:Page, num:number) {
-        const gridSelector = "::-p-xpath(/html/body/app-root/div/div[3]/div[2]/app-game/div/div/app-game-board/div/div/div[2])"
+      const isArchive = page.url().toLowerCase().includes("archive");
+  
+      const gridSelector = isArchive
+        ? "::-p-xpath(/html/body/app-root/div/div[3]/div[2]/app-archive/div/div/app-game-board/div/div/div[2])"
+        : "::-p-xpath(/html/body/app-root/div/div[3]/div[2]/app-game/div/div/app-game-board/div/div/div[2])";
+      
         const grid = await page.waitForSelector(gridSelector);
         if (!grid) {
           throw new Error("Grid not found");
@@ -132,42 +136,26 @@ export default class LeConnectionsLooker extends Looker {
   
   }
   
-    async clickFourPlayers (page:Page) {  
-      const gridSelector = "::-p-xpath(/html/body/app-root/div/div[3]/div[2]/app-game/div/div/app-game-board/div/div/div[2])"
-      const grid = await page.waitForSelector(gridSelector);
-      if (!grid) {
-        throw new Error("Grid not found");
-      }
-      const people = await grid.$$(':scope > div');
-      console.log(`Found ${people.length} people in the grid`);
-    
-      for(let i = 0; i < 4; i++){
-        const person = people[i];
-        console.log(`Clicking person ${i + 1}`);
-        await person.click({delay: 1000});
-      }
-    
-    }
-  async clickFourPlayersArchive(page: Page) {
-    const gridSelector = "::-p-xpath(/html/body/app-root/div/div[3]/div[2]/app-archive/div/div/app-game-board/div/div/div[2])"
-    const grid = await page.waitForSelector(gridSelector);
-    if (!grid) {
-      throw new Error("Grid not found");
-    }
-    const people = await grid.$$(':scope > div');
-    console.log(`Found ${people.length} people in the grid`);
-
-    for(let i = 0; i < 4; i++){
-      // ghetto add on the 4th
-      const person = people[i];
-      console.log(`Clicking person ${i + 1}`);
-      // take screen shot
-      const screenshotPath = `person_${i + 1}.png`;
-      await person.screenshot({ path: screenshotPath });
-      await person.click({delay: 1000});
+  async clickFourPlayers(page: Page) {
+    const isArchive = page.url().toLowerCase().includes("archive");
+  
+    const gridSelector = isArchive
+      ? "::-p-xpath(/html/body/app-root/div/div[3]/div[2]/app-archive/div/div/app-game-board/div/div/div[2])"
+      : "::-p-xpath(/html/body/app-root/div/div[3]/div[2]/app-game/div/div/app-game-board/div/div/div[2])";
+  
+    console.log(`[clickFourPlayers]: Using selector for ${isArchive ? "archive" : "live"} page`);
+  
+    const grid = await page.waitForSelector(gridSelector, { timeout: 15000 });
+    if (!grid) throw new Error("Grid not found");
+  
+    const people = await grid.$$(":scope > div");
+    console.log(`[clickFourPlayers]: Found ${people.length} people in the grid`);
+  
+    for (let i = 0; i < Math.min(4, people.length); i++) {
+      console.log(`[clickFourPlayers]: Clicking person ${i + 1}`);
+      await people[i].click({ delay: 1000 });
     }
   }
-  
   
   async clickSubmit(page:Page) { 
       try {
