@@ -7,9 +7,9 @@ pipeline{
                 echo 'Hello World'
             }
         }
-        stage('Build Docker image') {
+        stage('installing dependencies') {
             steps {
-                sh 'docker build -t nba-lookers:${GIT_COMMIT} .'
+                sh 'npm i'
             }
         }
 
