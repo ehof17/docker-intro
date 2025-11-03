@@ -7,5 +7,11 @@ pipeline{
                 echo 'Hello World'
             }
         }
+        stage('Build Docker image') {
+            steps {
+                sh 'docker build -t nba-lookers:${GIT_COMMIT} .'
+            }
+        }
+
     }
 }
